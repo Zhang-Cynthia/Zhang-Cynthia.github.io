@@ -83,7 +83,7 @@
         
   
     <h1 itemprop="name">
-      <a class="p-name article-title" href="/2024/06/04/firstblog/firstblog/">firstblog</a>
+      <a class="p-name article-title" href="/2024/06/04/firstblog/firstblog/">本地连接到Github</a>
     </h1>
   
 
@@ -91,11 +91,49 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        
+        <h1 id="1-连接Github"><a href="#1-连接Github" class="headerlink" title="1 连接Github"></a>1 连接Github</h1><p>确保docker里的hexo已经打开，exec执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it hexo /bin/bash</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-设置用户名和邮箱"><a href="#2-设置用户名和邮箱" class="headerlink" title="2 设置用户名和邮箱"></a>2 设置用户名和邮箱</h1><p>注意复制用户名和邮箱的时候引号里面不要有空格</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;GitHub 用户名&quot;</span><br><span class="line">git config --global user.email &quot;GitHub 邮箱&quot;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-创建SSH密钥"><a href="#3-创建SSH密钥" class="headerlink" title="3 创建SSH密钥"></a>3 创建SSH密钥</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;GitHub 邮箱&quot;</span><br></pre></td></tr></table></figure>
+
+<p>然后一路回车即可</p>
+<h2 id="3-1-添加密钥"><a href="#3-1-添加密钥" class="headerlink" title="3.1 添加密钥"></a>3.1 添加密钥</h2><p>进入root&#x2F;.ssh目录，cat打开id_rsa.pub文件并复制里面的内容，如果出现乱码，则可能是第二步设置用户名和邮箱的时候粘贴了空格，重新执行一遍即可</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd root/.ssh</span><br><span class="line">cat id_rsa.pub</span><br></pre></td></tr></table></figure>
+
+<p>登录Github，进入settings页面，选择左边栏的SSH and GPG keys，点击 New SSH key。Title 随便取个名字，粘贴复制的 id_rsa.pub 内容到 Key 中，点击 Add SSH key 完成添加。</p>
+<h2 id="3-2-验证连接"><a href="#3-2-验证连接" class="headerlink" title="3.2 验证连接"></a>3.2 验证连接</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure>
+
+<p>输入yes回车确认，显示 “Hi xxx! You’ve successfully……” 即连接成功。</p>
+<h1 id="4-创建Github-Pages仓库"><a href="#4-创建Github-Pages仓库" class="headerlink" title="4 创建Github Pages仓库"></a>4 创建Github Pages仓库</h1><p>GitHub 主页右上角加号 -&gt; New repository：</p>
+<ul>
+<li>Repository name 中输入 <code>用户名.github.io</code>    #用户名是Github用户名</li>
+<li>勾选 “Initialize this repository with a README”</li>
+<li>Description 选填</li>
+</ul>
+<p>填好后点击创建，创建后默认自动启用 HTTPS，博客地址为：<code>https://用户名.github.io</code></p>
+<h1 id="5-部署Hexo到Github-Pages"><a href="#5-部署Hexo到Github-Pages" class="headerlink" title="5 部署Hexo到Github Pages"></a>5 部署Hexo到Github Pages</h1><p>首先安装hexo-deployer-git</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<p>然后进入hexo&#x2F;blog里的_config.yml文件，将末尾的内容修改成如下内容。注意type、repository和branch冒号后面有一个空格。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repository: git@github.com:用户名/用户名.github.io.git</span><br><span class="line">  branch: gh-pages</span><br></pre></td></tr></table></figure>
+
+<p>其实就是通过 SSH 进行连接，SSH 连接地址可以 直接在仓库 <code>&lt;&gt;Code</code> 里面选择看到。</p>
+<p>Ctrl+S保存后，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hexo clean  #清除缓存和已生成的静态文件</span><br><span class="line">hexo new &quot;My First Blog&quot; #新建md文件</span><br><span class="line">hexo g   #生成页面</span><br><span class="line">hexo s    #启动预览</span><br><span class="line">hexo d    #将网站上传到Github上</span><br></pre></td></tr></table></figure>
+
+<p>然后需要在库设置（Repository Settings）中将默认分支设置为_config.yml配置中的分支名称，即gh-pages</p>
+<p><img src="/undefined/Users\86151\Pictures\1.jpg"></p>
+<p>然后在 pages 页面调整源分支：</p>
+<p><img src="/undefined/Users\86151\Pictures\2.jpg"></p>
+<p>这时浏览器访问 <code>https://用户名.github.io</code> 就可以看到 Hexo 网站了。</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/06/04/firstblog/firstblog/" data-id="clx17jpr8000248d81cwo35ex" data-title="firstblog" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2024/06/04/firstblog/firstblog/" data-id="clx1fyqi800021jd89btg6vlr" data-title="本地连接到Github" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -133,7 +171,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/06/03/hexo-install/" data-id="clx17jpqz000048d830x783ij" data-title="hexo install" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2024/06/03/hexo-install/" data-id="clx1fyqhg00001jd8appkeulo" data-title="hexo install" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -184,7 +222,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/1970/01/01/hello-world/" data-id="clx17jpr5000148d8cjwl1b99" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/1970/01/01/hello-world/" data-id="clx1fyqi400011jd8anpedlod" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -227,7 +265,7 @@
       <ul>
         
           <li>
-            <a href="/2024/06/04/firstblog/firstblog/">firstblog</a>
+            <a href="/2024/06/04/firstblog/firstblog/">本地连接到Github</a>
           </li>
         
           <li>
